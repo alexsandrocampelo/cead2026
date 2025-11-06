@@ -2,7 +2,7 @@ import React from 'react';
 import type { SubmittedReport } from './types';
 import {
     IconHeart, IconUsers, IconGraduationCap, IconClipboardList,
-    IconGift, IconCheckCircle, IconArrowLeft
+    IconGift, IconCheckCircle, IconArrowLeft, IconInfo
 } from './constants';
 
 interface StatCardProps {
@@ -27,6 +27,7 @@ const StatCard: React.FC<StatCardProps> = ({ icon, title, value, color }) => (
 
 const Dashboard: React.FC<{ onBack: () => void; reports: SubmittedReport[] }> = ({ onBack, reports }) => {
     const validatedReports = reports.filter(r => r.status === 'validated');
+    const pendingReportsCount = reports.filter(r => r.status === 'pending').length;
     const data = validatedReports.map(r => r.data);
 
     const totalConversoes = data.reduce((sum, report) => sum + report.totalConversoes, 0);
@@ -58,6 +59,18 @@ const Dashboard: React.FC<{ onBack: () => void; reports: SubmittedReport[] }> = 
                     <IconArrowLeft className="h-5 w-5 mr-2" /> Voltar ao Formulário
                 </button>
             </div>
+
+            {pendingReportsCount > 0 && (
+                <div className="mb-6 p-4 border-l-4 bg-yellow-50 border-yellow-400 text-yellow-700 rounded-r-md">
+                    <div className="flex">
+                        <div className="flex-shrink-0"><IconInfo className="h-5 w-5" /></div>
+                        <div className="ml-3">
+                            <p className="text-sm font-bold">Relatórios Pendentes</p>
+                            <p className="text-sm mt-1">Existem <strong>{pendingReportsCount}</strong> relatório(s) aguardando sua validação na tela de Validação. Os dados abaixo refletem apenas os relatórios já validados.</p>
+                        </div>
+                    </div>
+                </div>
+            )}
             
             {validatedReports.length === 0 ? (
                 <div className="text-center py-12 bg-gray-50 rounded-lg">

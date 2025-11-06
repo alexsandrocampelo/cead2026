@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback, ChangeEvent } from 'react';
+import React, { useState, useEffect, useCallback, ChangeEvent, useRef } from 'react';
 import type { ReportData, SubmittedReport } from './types';
 import {
   AREAS, MONTHS, WEEK_DAYS, SABADO_CULTOS,
   IconCheckCircle, IconDashboard, IconExport, IconInfo, IconBuilding,
   IconGraduationCap, IconClipboardList, IconUsers, IconHeart, IconGift,
-  IconBookOpen, IconLocationMarker, IconBriefcase, IconShieldCheck, IconArrowLeft
+  IconBookOpen, IconLocationMarker, IconBriefcase, IconShieldCheck, IconArrowLeft,
+  IconDatabase // Adicionado
 } from './constants';
 import Dashboard from './Dashboard';
 
@@ -76,7 +77,7 @@ const Header: React.FC<{ onDashboardClick: () => void; onCoordinatorClick: () =>
     <div className="flex justify-between items-center mt-4 border-t border-gray-700 pt-4">
       <div className="flex items-center">
         <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
-        <div className="ml-3 text-sm"><p>Sincronização Automática Ativa</p><p className="text-gray-400">Última sync: {new Date().toLocaleTimeString()}</p></div>
+        <div className="ml-3 text-sm"><p>Salvamento Local Ativo</p><p className="text-gray-400">Rascunho salvo às {new Date().toLocaleTimeString()}</p></div>
       </div>
       <div className="flex items-center space-x-2">
         <button onClick={onCoordinatorClick} className="flex items-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-md transition duration-300"><IconCheckCircle className="h-5 w-5 mr-2" /> Validação</button>
@@ -126,6 +127,9 @@ const ReportForm: React.FC<ReportFormProps> = ({ formData, onInputChange, onRadi
         
         {currentStep === 1 && (
             <>
+              <InfoBox color="yellow">
+                  <strong>Atenção:</strong> Seus relatórios são salvos apenas neste dispositivo (celular, computador, etc.). Para transferir dados entre dispositivos, use a função "Importar/Exportar" na tela inicial.
+              </InfoBox>
               <Section title="Informações Básicas" icon={<IconBuilding className="h-6 w-6" />} color="bg-blue-600">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="md:col-span-2"><FormField label="Congregação" name="congregacao" value={formData.congregacao} onChange={onInputChange} required placeholder="Digite o nome da congregação" /></div>
@@ -285,7 +289,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ formData, onInputChange, onRadi
   );
 };
 
-const AuthModal: React.FC<{ title: string; description: string; onAuthSuccess: () => void; onClose: () => void; correctPassword: string; }> = ({ title, description, onAuthSuccess, onClose, correctPassword }) => {
+const AuthModal: React.FC<{ title: string; description: string; onAuthSuccess: () => void; onClose: () => void; correctPassword: string; children?: React.ReactNode; }> = ({ title, description, onAuthSuccess, onClose, correctPassword, children }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const handleAuth = () => {
@@ -299,10 +303,11 @@ const AuthModal: React.FC<{ title: string; description: string; onAuthSuccess: (
         <h2 className="text-2xl font-bold text-gray-800 mb-4">{title}</h2>
         <p className="text-gray-600 mb-6">{description}</p>
         {error && <p className="bg-red-100 text-red-700 p-3 rounded-md mb-4 text-sm">{error}</p>}
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} onKeyPress={handleKeyPress} placeholder="Digite a senha" className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" autoFocus />
+        {!children && <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} onKeyPress={handleKeyPress} placeholder="Digite a senha" className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" autoFocus />}
+        {children}
         <div className="mt-6 flex justify-end space-x-4">
           <button onClick={onClose} className="px-6 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">Cancelar</button>
-          <button onClick={handleAuth} className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Acessar</button>
+          {!children && <button onClick={handleAuth} className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Acessar</button>}
         </div>
       </div>
     </div>
@@ -330,24 +335,17 @@ const CoordinatorView: React.FC<{ onBack: () => void; reports: SubmittedReport[]
         ) : (
           <div className="space-y-6">
             {reports.map((report, index) => (
-              <div key={index} className={`p-6 rounded-lg shadow-md border-l-4 ${report.status === 'pending' ? 'bg-white border-yellow-500' : 'bg-green-50 border-green-500'}`}>
+              report.status === 'pending' &&
+              <div key={index} className="p-6 rounded-lg shadow-md border-l-4 bg-white border-yellow-500">
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-xl font-bold text-gray-800">{report.data.congregacao}</p>
                     <p className="text-sm text-gray-500">{report.data.area} - {report.data.mes}/{report.data.ano}</p>
                     <p className="text-sm text-gray-600 mt-2">Enviado por: {report.data.dirigenteAssinatura}</p>
                   </div>
-                  <div>
-                    {report.status === 'pending' ? (
-                      <button onClick={() => onValidate(index)} className="flex items-center bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
-                        <IconCheckCircle className="h-5 w-5 mr-2" /> Validar Relatório
-                      </button>
-                    ) : (
-                      <div className="flex items-center text-green-600 font-semibold bg-green-100 px-4 py-2 rounded-full">
-                        <IconCheckCircle className="h-5 w-5 mr-2" /> Validado
-                      </div>
-                    )}
-                  </div>
+                  <button onClick={() => onValidate(index)} className="flex items-center bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                    <IconCheckCircle className="h-5 w-5 mr-2" /> Validar Relatório
+                  </button>
                 </div>
               </div>
             ))}
@@ -357,13 +355,23 @@ const CoordinatorView: React.FC<{ onBack: () => void; reports: SubmittedReport[]
   );
 };
 
-
 const App: React.FC = () => {
   const [view, setView] = useState<'form' | 'dashboard' | 'coordinator'>('form');
   const [showDashboardModal, setShowDashboardModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showCoordinatorModal, setShowCoordinatorModal] = useState(false);
-  const [formData, setFormData] = useState<ReportData>(initialFormData);
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const importFileRef = useRef<HTMLInputElement>(null);
+  
+  const [formData, setFormData] = useState<ReportData>(() => {
+    try {
+      const localData = localStorage.getItem('reportDraft');
+      return localData ? JSON.parse(localData) : initialFormData;
+    } catch (error) {
+      console.error("Could not parse draft from localStorage", error);
+      return initialFormData;
+    }
+  });
   
   const [submittedReports, setSubmittedReports] = useState<SubmittedReport[]>(() => {
     try {
@@ -376,7 +384,28 @@ const App: React.FC = () => {
   });
 
   useEffect(() => {
-    localStorage.setItem('submittedReports', JSON.stringify(submittedReports));
+    const timer = setInterval(() => {
+      // Force re-render to update the "last saved" timestamp in the header
+      setFormData(prev => ({...prev}));
+    }, 60000); // every minute
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('reportDraft', JSON.stringify(formData));
+    } catch (error) {
+      console.error("Failed to save draft to localStorage:", error);
+    }
+  }, [formData]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('submittedReports', JSON.stringify(submittedReports));
+    } catch (error) {
+      console.error("Failed to save reports to localStorage:", error);
+      alert("Atenção: Não foi possível salvar os relatórios. O armazenamento local do seu navegador pode estar cheio ou desativado.");
+    }
   }, [submittedReports]);
 
   const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -442,20 +471,69 @@ const App: React.FC = () => {
     document.body.removeChild(link);
   };
 
+  const handleExportJson = () => {
+    if (submittedReports.length === 0) {
+      alert('Não há dados para exportar.');
+      return;
+    }
+    const jsonString = JSON.stringify(submittedReports, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `relatorios-ieadpe-backup-${new Date().toISOString().slice(0, 10)}.json`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleImportJson = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (submittedReports.length > 0) {
+      if (!window.confirm('A importação substituirá todos os dados existentes. Deseja continuar?')) {
+        return;
+      }
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result;
+        if (typeof text !== 'string') throw new Error('File could not be read');
+        const data = JSON.parse(text);
+        if (Array.isArray(data) && data.every(item => 'data' in item && 'status' in item)) {
+          setSubmittedReports(data);
+          alert('Dados importados com sucesso!');
+          setShowTransferModal(false);
+        } else {
+          throw new Error('Formato de arquivo inválido.');
+        }
+      } catch (error) {
+        alert(`Erro ao importar o arquivo: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const handleFormSubmit = (data: ReportData) => {
     setSubmittedReports(prev => [...prev, { data, status: 'pending' }]);
     setFormData(initialFormData);
-    alert('Relatório enviado com sucesso para validação do Coordenador!');
+    alert('Relatório enviado com sucesso! Ele agora está pendente de aprovação na tela de Validação do Coordenador.');
   };
   
   const handleValidateReport = (indexToValidate: number) => {
-    setSubmittedReports(prev => 
-      prev.map((report, index) => 
-        index === indexToValidate ? { ...report, status: 'validated' } : report
-      )
-    );
+    const reportToValidate = submittedReports[indexToValidate];
+    if (reportToValidate && window.confirm(`Deseja realmente validar o relatório da congregação "${reportToValidate.data.congregacao}"?`)) {
+      setSubmittedReports(prev => 
+        prev.map((report, index) => 
+          index === indexToValidate ? { ...report, status: 'validated' } : report
+        )
+      );
+    }
   };
-
 
   return (
     <>
@@ -466,9 +544,12 @@ const App: React.FC = () => {
             {view === 'form' && (
               <>
                 <Header onDashboardClick={() => setShowDashboardModal(true)} onCoordinatorClick={() => setShowCoordinatorModal(true)} />
-                <div className="bg-white p-6 shadow-lg">
+                <div className="bg-white p-6 shadow-lg grid grid-cols-1 md:grid-cols-2 gap-4">
                   <button onClick={() => setShowExportModal(true)} className="flex items-center w-full justify-center bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-4 rounded-md transition duration-300">
-                      <IconExport className="h-5 w-5 mr-2" /> Exportar Banco de Dados para Excel/Power BI
+                      <IconExport className="h-5 w-5 mr-2" /> Exportar para Excel/Power BI
+                  </button>
+                  <button onClick={() => setShowTransferModal(true)} className="flex items-center w-full justify-center bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-md transition duration-300">
+                      <IconDatabase className="h-5 w-5 mr-2" /> Importar/Exportar Dados
                   </button>
                 </div>
                 <ReportForm formData={formData} onInputChange={handleInputChange} onRadioChange={handleRadioChange} setFormData={setFormData} onFinalSubmit={handleFormSubmit} />
@@ -503,12 +584,32 @@ const App: React.FC = () => {
 
       {showExportModal && (
         <AuthModal 
-          title="Exportar Banco de Dados"
-          description="Insira a senha para exportar todos os relatórios enviados para um arquivo CSV, compatível com Excel e Power BI."
+          title="Exportar para Excel/Power BI"
+          description="Insira a senha para exportar todos os relatórios enviados para um arquivo CSV."
           onAuthSuccess={() => { handleDataExport(); setShowExportModal(false); }}
           onClose={() => setShowExportModal(false)}
           correctPassword="dashboard123"
         />
+      )}
+      
+      {showTransferModal && (
+          <AuthModal
+              title="Transferência de Dados"
+              description="Use esta ferramenta para salvar um backup (Exportar) ou carregar dados de outro dispositivo (Importar)."
+              onAuthSuccess={() => {}}
+              onClose={() => setShowTransferModal(false)}
+              correctPassword="transferir123"
+          >
+              <div className="mt-4 space-y-4">
+                  <button onClick={handleExportJson} className="w-full flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md transition duration-300">
+                      <IconExport className="h-5 w-5 mr-2" /> Exportar Dados (Backup)
+                  </button>
+                  <button onClick={() => importFileRef.current?.click()} className="w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md transition duration-300">
+                      <IconDatabase className="h-5 w-5 mr-2" /> Importar Dados (Restaurar)
+                  </button>
+                  <input type="file" ref={importFileRef} onChange={handleImportJson} className="hidden" accept=".json" />
+              </div>
+          </AuthModal>
       )}
     </>
   );
