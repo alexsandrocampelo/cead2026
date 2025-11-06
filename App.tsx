@@ -33,8 +33,8 @@ const fieldLabels: { [key in keyof ReportData]?: string } = {
   literaturaQuantidade: 'Literatura Distribuída (Quantidade)',
   areaConferenciaMissionaria: 'Área: Conferência Missionária', areaPreCongresso: 'Área: Pré-Congresso', areaFormaturaDiscipulado: 'Área: Formatura de Discipulado', areaCruzadaEvangelistica: 'Área: Cruzada Evangelística', areaCultoJovensUnificado: 'Área: Culto de Jovens Unificado', areaSabadoCultoJovens: 'Área: Sábado do Culto de Jovens',
   discTurmasBasico: 'Discipulado: Turmas Básico', discTurmasIntermediario: 'Discipulado: Turmas Intermediário', discTurmasAvancado: 'Discipulado: Turmas Avançado', discTotalTurmas: 'Discipulado: Total de Turmas', discTotalProfessores: 'Discipulado: Total de Professores', discPossuiResponsavel: 'Discipulado: Possui Responsável?', discAlunosBasico: 'Discipulado: Alunos Básico', discAlunosIntermediario: 'Discipulado: Alunos Intermediário', discAlunosAvancado: 'Discipulado: Alunos Avançado', discTotalAlunos: 'Discipulado: Total de Alunos', discAlunosAdolescentes: 'Discipulado: Alunos Adolescentes', discAlunosJovens: 'Discipulado: Alunos Jovens', discAlunosAdultos: 'Discipulado: Alunos Adultos', discAlunosIdosos: 'Discipulado: Alunos Idosos', discAlunosPcd: 'Discipulado: Alunos PcD', discFreqTotalPresencas: 'Discipulado: Total de Presenças', discFreqTotalAusencias: 'Discipulado: Total de Ausências', discFreqNovosAlunosMes: 'Discipulado: Novos Alunos no Mês', discFreqConcluintesAguardandoBatismo: 'Discipulado: Concluintes Aguardando Batismo',
-  ministVisitasNovosConvertidos: 'Outras Atividades: Visitas a Novos Convertidos', ministAconselhamentoIndividual: 'Outras Atividades: Aconselhamento Individual', ministVisitasMinisteriais: 'Outras Atividades: Visitas Ministeriais', ministVisitasApoiosArea: 'Outras Atividades: Visitas de Apoios da Área', ministDiasDiscipuladoFormouCultos: 'Outras Atividades: Dias que Discipulado Formou em Cultos',
-  dirigenteAssinatura: 'Assinatura do Dirigente', secretariaAssinatura: 'Assinatura da Secretária',
+  ministVisitasNovosConvertidos: 'Ministerial: Visitas a Novos Convertidos', ministAconselhamentoIndividual: 'Ministerial: Aconselhamento Individual', ministVisitasMinisteriais: 'Ministerial: Visitas Ministeriais', ministVisitasApoiosArea: 'Ministerial: Visitas de Apoios da Área', ministDiasDiscipuladoFormouCultos: 'Ministerial: Dias que Discipulado Formou em Cultos',
+  dirigenteAssinatura: 'Assinatura do Dirigente da Campanha', secretariaAssinatura: 'Assinatura da Secretária da Campanha',
 };
 
 // --- Helper UI Components ---
@@ -252,7 +252,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ formData, onInputChange, onRadi
                   </div></div>
               </Section>
               
-              <Section title="Outras Atividades" icon={<IconBriefcase className="h-6 w-6" />} color="bg-gray-700">
+              <Section title="Atividades Ministeriais" icon={<IconBriefcase className="h-6 w-6" />} color="bg-gray-700">
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                        <FormField label="Visitas a Novos Convertidos" name="ministVisitasNovosConvertidos" value={formData.ministVisitasNovosConvertidos} onChange={onInputChange} type="number" />
                        <FormField label="Aconselhamento Individual" name="ministAconselhamentoIndividual" value={formData.ministAconselhamentoIndividual} onChange={onInputChange} type="number" />
@@ -271,8 +271,8 @@ const ReportForm: React.FC<ReportFormProps> = ({ formData, onInputChange, onRadi
                 <Section title="Assinaturas Digitais" icon={<IconShieldCheck className="h-6 w-6" />} color="bg-teal-600">
                     <InfoBox color="blue">Ao preencher seu nome completo abaixo, você confirma a veracidade de todas as informações contidas neste relatório. Esta ação tem validade de assinatura digital.</InfoBox>
                     <div className="space-y-6">
-                        <FormField label="Assinatura do Dirigente da Congregação" name="dirigenteAssinatura" value={formData.dirigenteAssinatura} onChange={onInputChange} required placeholder="Digite o nome completo do Dirigente"/>
-                        <FormField label="Assinatura da Secretária de Missões" name="secretariaAssinatura" value={formData.secretariaAssinatura} onChange={onInputChange} required placeholder="Digite o nome completo da Secretária"/>
+                        <FormField label="Assinatura do Dirigente da Campanha" name="dirigenteAssinatura" value={formData.dirigenteAssinatura} onChange={onInputChange} required placeholder="Digite o nome completo do Dirigente da Campanha"/>
+                        <FormField label="Assinatura da Secretária da Campanha" name="secretariaAssinatura" value={formData.secretariaAssinatura} onChange={onInputChange} required placeholder="Digite o nome completo da Secretária da Campanha"/>
                     </div>
                 </Section>
                 <div className="flex justify-between items-center mt-8">
