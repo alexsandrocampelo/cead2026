@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, ChangeEvent } from 'react';
 import type { ReportData, SubmittedReport } from './types';
 import {
@@ -20,7 +19,7 @@ const initialFormData: ReportData = {
   areaConferenciaMissionaria: 0, areaPreCongresso: 0, areaFormaturaDiscipulado: 0, areaCruzadaEvangelistica: 0, areaCultoJovensUnificado: 0, areaSabadoCultoJovens: '',
   discTurmasBasico: 0, discTurmasIntermediario: 0, discTurmasAvancado: 0, discTotalTurmas: 0, discTotalProfessores: 0, discPossuiResponsavel: 'sim', discAlunosBasico: 0, discAlunosIntermediario: 0, discAlunosAvancado: 0, discTotalAlunos: 0, discAlunosAdolescentes: 0, discAlunosJovens: 0, discAlunosAdultos: 0, discAlunosIdosos: 0, discAlunosPcd: 0,
   discFreqTotalPresencas: 0, discFreqTotalAusencias: 0, discFreqNovosAlunosMes: 0, discFreqConcluintesAguardandoBatismo: 0,
-  ministVisitasNovosConvertidos: 0, ministAconselhamentoIndividual: 0, ministVisitasMinisteriais: 0, ministVisitasApoiosArea: 0, ministDiasDiscipuladoFormouCultos: 0, ministReunioesMinisteriais: 0, ministEstudosBiblicosLideres: 0, ministTreinamentoObreiros: 0, ministProjetosSociais: 0,
+  ministVisitasNovosConvertidos: 0, ministAconselhamentoIndividual: 0, ministVisitasMinisteriais: 0, ministVisitasApoiosArea: 0, ministDiasDiscipuladoFormouCultos: 0,
   dirigenteAssinatura: '', secretariaAssinatura: ''
 };
 
@@ -34,9 +33,8 @@ const fieldLabels: { [key in keyof ReportData]?: string } = {
   literaturaQuantidade: 'Literatura Distribuída (Quantidade)',
   areaConferenciaMissionaria: 'Área: Conferência Missionária', areaPreCongresso: 'Área: Pré-Congresso', areaFormaturaDiscipulado: 'Área: Formatura de Discipulado', areaCruzadaEvangelistica: 'Área: Cruzada Evangelística', areaCultoJovensUnificado: 'Área: Culto de Jovens Unificado', areaSabadoCultoJovens: 'Área: Sábado do Culto de Jovens',
   discTurmasBasico: 'Discipulado: Turmas Básico', discTurmasIntermediario: 'Discipulado: Turmas Intermediário', discTurmasAvancado: 'Discipulado: Turmas Avançado', discTotalTurmas: 'Discipulado: Total de Turmas', discTotalProfessores: 'Discipulado: Total de Professores', discPossuiResponsavel: 'Discipulado: Possui Responsável?', discAlunosBasico: 'Discipulado: Alunos Básico', discAlunosIntermediario: 'Discipulado: Alunos Intermediário', discAlunosAvancado: 'Discipulado: Alunos Avançado', discTotalAlunos: 'Discipulado: Total de Alunos', discAlunosAdolescentes: 'Discipulado: Alunos Adolescentes', discAlunosJovens: 'Discipulado: Alunos Jovens', discAlunosAdultos: 'Discipulado: Alunos Adultos', discAlunosIdosos: 'Discipulado: Alunos Idosos', discAlunosPcd: 'Discipulado: Alunos PcD', discFreqTotalPresencas: 'Discipulado: Total de Presenças', discFreqTotalAusencias: 'Discipulado: Total de Ausências', discFreqNovosAlunosMes: 'Discipulado: Novos Alunos no Mês', discFreqConcluintesAguardandoBatismo: 'Discipulado: Concluintes Aguardando Batismo',
-  ministVisitasNovosConvertidos: 'Visitas a Novos Convertidos', ministAconselhamentoIndividual: 'Aconselhamento Individual', ministVisitasMinisteriais: 'Visitas Ministeriais', ministVisitasApoiosArea: 'Visitas de Apoios da Área', ministDiasDiscipuladoFormouCultos: 'Dias que Discipulado Formou nos Cultos',
-  ministReunioesMinisteriais: 'Reuniões Ministeriais', ministEstudosBiblicosLideres: 'Estudos Bíblicos para Líderes', ministTreinamentoObreiros: 'Treinamento para Obreiros', ministProjetosSociais: 'Projetos Sociais',
-  dirigenteAssinatura: 'Assinatura do Dirigente da Campanha', secretariaAssinatura: 'Assinatura da Secretária da Campanha',
+  ministVisitasNovosConvertidos: 'Outras Atividades: Visitas a Novos Convertidos', ministAconselhamentoIndividual: 'Outras Atividades: Aconselhamento Individual', ministVisitasMinisteriais: 'Outras Atividades: Visitas Ministeriais', ministVisitasApoiosArea: 'Outras Atividades: Visitas de Apoios da Área', ministDiasDiscipuladoFormouCultos: 'Outras Atividades: Dias que Discipulado Formou em Cultos',
+  dirigenteAssinatura: 'Assinatura do Dirigente', secretariaAssinatura: 'Assinatura da Secretária',
 };
 
 // --- Helper UI Components ---
@@ -254,18 +252,13 @@ const ReportForm: React.FC<ReportFormProps> = ({ formData, onInputChange, onRadi
                   </div></div>
               </Section>
               
-              <Section title="Relatório Ministerial" icon={<IconBriefcase className="h-6 w-6" />} color="bg-slate-700">
-                   <InfoBox color="purple">Detalhe as atividades realizadas pela liderança e ministério da congregação.</InfoBox>
+              <Section title="Outras Atividades" icon={<IconBriefcase className="h-6 w-6" />} color="bg-gray-700">
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                        <FormField label="Visitas a Novos Convertidos" name="ministVisitasNovosConvertidos" value={formData.ministVisitasNovosConvertidos} onChange={onInputChange} type="number" />
                        <FormField label="Aconselhamento Individual" name="ministAconselhamentoIndividual" value={formData.ministAconselhamentoIndividual} onChange={onInputChange} type="number" />
                        <FormField label="Visitas Ministeriais" name="ministVisitasMinisteriais" value={formData.ministVisitasMinisteriais} onChange={onInputChange} type="number" />
                        <FormField label="Visitas de Apoios da Área" name="ministVisitasApoiosArea" value={formData.ministVisitasApoiosArea} onChange={onInputChange} type="number" />
-                       <FormField label="Reuniões Ministeriais" name="ministReunioesMinisteriais" value={formData.ministReunioesMinisteriais} onChange={onInputChange} type="number" />
-                       <FormField label="Estudos Bíblicos para Líderes" name="ministEstudosBiblicosLideres" value={formData.ministEstudosBiblicosLideres} onChange={onInputChange} type="number" />
-                       <FormField label="Treinamento para Obreiros" name="ministTreinamentoObreiros" value={formData.ministTreinamentoObreiros} onChange={onInputChange} type="number" />
-                       <FormField label="Projetos Sociais" name="ministProjetosSociais" value={formData.ministProjetosSociais} onChange={onInputChange} type="number" description="Ex: cestas básicas, visitas a asilos, etc." />
-                       <div className="md:col-span-2"><FormField label="Dias que Discipulado Formou nos Cultos" name="ministDiasDiscipuladoFormouCultos" value={formData.ministDiasDiscipuladoFormouCultos} onChange={onInputChange} type="number" description="Máximo 31 dias. Refere-se aos dias em que a classe de discipulado participou ativamente do culto (louvor, oportunidade, etc)." /></div>
+                       <div className="md:col-span-2"><FormField label="Dias que Discipulado Formou em Cultos" name="ministDiasDiscipuladoFormouCultos" value={formData.ministDiasDiscipuladoFormouCultos} onChange={onInputChange} type="number" description="Máximo 31 dias" /></div>
                   </div>
               </Section>
 
@@ -278,8 +271,8 @@ const ReportForm: React.FC<ReportFormProps> = ({ formData, onInputChange, onRadi
                 <Section title="Assinaturas Digitais" icon={<IconShieldCheck className="h-6 w-6" />} color="bg-teal-600">
                     <InfoBox color="blue">Ao preencher seu nome completo abaixo, você confirma a veracidade de todas as informações contidas neste relatório. Esta ação tem validade de assinatura digital.</InfoBox>
                     <div className="space-y-6">
-                        <FormField label="Assinatura do Dirigente da Campanha" name="dirigenteAssinatura" value={formData.dirigenteAssinatura} onChange={onInputChange} required placeholder="Digite o nome completo do Dirigente da Campanha"/>
-                        <FormField label="Assinatura da Secretária da Campanha" name="secretariaAssinatura" value={formData.secretariaAssinatura} onChange={onInputChange} required placeholder="Digite o nome completo da Secretária da Campanha"/>
+                        <FormField label="Assinatura do Dirigente da Congregação" name="dirigenteAssinatura" value={formData.dirigenteAssinatura} onChange={onInputChange} required placeholder="Digite o nome completo do Dirigente"/>
+                        <FormField label="Assinatura da Secretária de Missões" name="secretariaAssinatura" value={formData.secretariaAssinatura} onChange={onInputChange} required placeholder="Digite o nome completo da Secretária"/>
                     </div>
                 </Section>
                 <div className="flex justify-between items-center mt-8">
@@ -371,25 +364,19 @@ const App: React.FC = () => {
   const [showExportModal, setShowExportModal] = useState(false);
   const [showCoordinatorModal, setShowCoordinatorModal] = useState(false);
   const [formData, setFormData] = useState<ReportData>(initialFormData);
-  const [submittedReports, setSubmittedReports] = useState<SubmittedReport[]>([]);
+  
+  const [submittedReports, setSubmittedReports] = useState<SubmittedReport[]>(() => {
+    try {
+      const localData = localStorage.getItem('submittedReports');
+      return localData ? JSON.parse(localData) : [];
+    } catch (error) {
+      console.error("Could not parse localStorage reports", error);
+      return [];
+    }
+  });
 
   useEffect(() => {
-    try {
-      const storedReports = localStorage.getItem('submittedReports');
-      if (storedReports) {
-        setSubmittedReports(JSON.parse(storedReports));
-      }
-    } catch (error) {
-      console.error("Failed to parse reports from localStorage", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('submittedReports', JSON.stringify(submittedReports));
-    } catch (error) {
-      console.error("Failed to save reports to localStorage", error);
-    }
+    localStorage.setItem('submittedReports', JSON.stringify(submittedReports));
   }, [submittedReports]);
 
   const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -427,29 +414,28 @@ const App: React.FC = () => {
 
   const handleDataExport = () => {
     if (submittedReports.length === 0) {
-        alert('Nenhum relatório para exportar.');
-        return;
+      alert('Não há relatórios para exportar.');
+      return;
     }
 
-    const reportKeys = Object.keys(initialFormData) as (keyof ReportData)[];
-    const headers = [...reportKeys.map(key => fieldLabels[key] || key), 'Status'].join(',');
+    const reportKeys = Object.keys(initialFormData) as Array<keyof ReportData>;
+    const headers = [...reportKeys.map(key => fieldLabels[key] || key), "Status da Validação"].join(',');
 
     const rows = submittedReports.map(report => {
         const values = reportKeys.map(key => {
             const value = report.data[key];
             const strValue = String(value);
             return strValue.includes(',') ? `"${strValue}"` : strValue;
-        });
-        values.push(report.status);
-        return values.join(',');
-    });
-    
-    const csvContent = `${headers}\n${rows.join('\n')}`;
+        }).join(',');
+        return `${values},${report.status}`;
+    }).join('\n');
+
+    const csvContent = `${headers}\n${rows}`;
     const blob = new Blob([`\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', 'relatorios_ieadpe.csv');
+    link.setAttribute('download', `banco_de_dados_relatorios_ieadpe_${new Date().toISOString().slice(0,10)}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -482,13 +468,13 @@ const App: React.FC = () => {
                 <Header onDashboardClick={() => setShowDashboardModal(true)} onCoordinatorClick={() => setShowCoordinatorModal(true)} />
                 <div className="bg-white p-6 shadow-lg">
                   <button onClick={() => setShowExportModal(true)} className="flex items-center w-full justify-center bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-4 rounded-md transition duration-300">
-                      <IconExport className="h-5 w-5 mr-2" /> Exportar Relatórios para Excel
+                      <IconExport className="h-5 w-5 mr-2" /> Exportar Banco de Dados para Excel/Power BI
                   </button>
                 </div>
                 <ReportForm formData={formData} onInputChange={handleInputChange} onRadioChange={handleRadioChange} setFormData={setFormData} onFinalSubmit={handleFormSubmit} />
               </>
             )}
-            {view === 'dashboard' && <Dashboard onBack={() => setView('form')} reports={submittedReports} />}
+            {view === 'dashboard' && <Dashboard reports={submittedReports} onBack={() => setView('form')} />}
             {view === 'coordinator' && <CoordinatorView onBack={() => setView('form')} reports={submittedReports} onValidate={handleValidateReport} />}
           </div>
         </main>
@@ -498,7 +484,7 @@ const App: React.FC = () => {
       {showDashboardModal && (
         <AuthModal 
           title="Acesso ao Dashboard"
-          description="Por favor, insira a senha para visualizar o dashboard."
+          description="Por favor, insira a senha para visualizar o dashboard com os dados atualizados."
           onAuthSuccess={() => { setView('dashboard'); setShowDashboardModal(false); }}
           onClose={() => setShowDashboardModal(false)}
           correctPassword="dashboard123"
@@ -517,8 +503,8 @@ const App: React.FC = () => {
 
       {showExportModal && (
         <AuthModal 
-          title="Exportar Relatório"
-          description="Por favor, insira a senha para exportar os dados para Excel (CSV)."
+          title="Exportar Banco de Dados"
+          description="Insira a senha para exportar todos os relatórios enviados para um arquivo CSV, compatível com Excel e Power BI."
           onAuthSuccess={() => { handleDataExport(); setShowExportModal(false); }}
           onClose={() => setShowExportModal(false)}
           correctPassword="dashboard123"
