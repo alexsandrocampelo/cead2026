@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, ChangeEvent } from 'react';
-import type { ReportData } from './types';
+import type { ReportData, SubmittedReport } from './types';
 import {
   AREAS, MONTHS, WEEK_DAYS, SABADO_CULTOS,
   IconCheckCircle, IconDashboard, IconExport, IconInfo, IconBuilding,
@@ -309,11 +309,6 @@ const AuthModal: React.FC<{ title: string; description: string; onAuthSuccess: (
   );
 };
 
-interface SubmittedReport {
-  data: ReportData;
-  status: 'pending' | 'validated';
-}
-
 const CoordinatorView: React.FC<{ onBack: () => void; reports: SubmittedReport[]; onValidate: (index: number) => void; }> = ({ onBack, reports, onValidate }) => {
   const pendingReports = reports.filter(r => r.status === 'pending');
 
@@ -371,6 +366,25 @@ const App: React.FC = () => {
   const [formData, setFormData] = useState<ReportData>(initialFormData);
   const [submittedReports, setSubmittedReports] = useState<SubmittedReport[]>([]);
 
+  useEffect(() => {
+    try {
+      const storedReports = localStorage.getItem('submittedReports');
+      if (storedReports) {
+        setSubmittedReports(JSON.parse(storedReports));
+      }
+    } catch (error) {
+      console.error("Failed to parse reports from localStorage", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('submittedReports', JSON.stringify(submittedReports));
+    } catch (error) {
+      console.error("Failed to save reports to localStorage", error);
+    }
+  }, [submittedReports]);
+
   const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     let processedValue: string | number = value;
@@ -405,17 +419,30 @@ const App: React.FC = () => {
   }, [formData.discAlunosBasico, formData.discAlunosIntermediario, formData.discAlunosAvancado]);
 
   const handleDataExport = () => {
-    const headers = Object.keys(formData).map(key => fieldLabels[key as keyof ReportData] || key).join(',');
-    const values = Object.values(formData).map(value => {
-        const strValue = String(value);
-        return strValue.includes(',') ? `"${strValue}"` : strValue;
-    }).join(',');
-    const csvContent = `${headers}\n${values}`;
+    if (submittedReports.length === 0) {
+        alert('Nenhum relatório para exportar.');
+        return;
+    }
+
+    const reportKeys = Object.keys(initialFormData) as (keyof ReportData)[];
+    const headers = [...reportKeys.map(key => fieldLabels[key] || key), 'Status'].join(',');
+
+    const rows = submittedReports.map(report => {
+        const values = reportKeys.map(key => {
+            const value = report.data[key];
+            const strValue = String(value);
+            return strValue.includes(',') ? `"${strValue}"` : strValue;
+        });
+        values.push(report.status);
+        return values.join(',');
+    });
+    
+    const csvContent = `${headers}\n${rows.join('\n')}`;
     const blob = new Blob([`\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', 'relatorio_ieadpe.csv');
+    link.setAttribute('download', 'relatorios_ieadpe.csv');
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -448,13 +475,13 @@ const App: React.FC = () => {
                 <Header onDashboardClick={() => setShowDashboardModal(true)} onCoordinatorClick={() => setShowCoordinatorModal(true)} />
                 <div className="bg-white p-6 shadow-lg">
                   <button onClick={() => setShowExportModal(true)} className="flex items-center w-full justify-center bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-4 rounded-md transition duration-300">
-                      <IconExport className="h-5 w-5 mr-2" /> Exportar para Excel
+                      <IconExport className="h-5 w-5 mr-2" /> Exportar Relatórios para Excel
                   </button>
                 </div>
                 <ReportForm formData={formData} onInputChange={handleInputChange} onRadioChange={handleRadioChange} setFormData={setFormData} onFinalSubmit={handleFormSubmit} />
               </>
             )}
-            {view === 'dashboard' && <Dashboard onBack={() => setView('form')} />}
+            {view === 'dashboard' && <Dashboard onBack={() => setView('form')} reports={submittedReports} />}
             {view === 'coordinator' && <CoordinatorView onBack={() => setView('form')} reports={submittedReports} onValidate={handleValidateReport} />}
           </div>
         </main>

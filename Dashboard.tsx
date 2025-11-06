@@ -1,4 +1,5 @@
 import React from 'react';
+import type { SubmittedReport } from './types';
 import {
     IconHeart, IconUsers, IconGraduationCap, IconClipboardList,
     IconGift, IconCheckCircle, IconArrowLeft
@@ -24,7 +25,31 @@ const StatCard: React.FC<StatCardProps> = ({ icon, title, value, color }) => (
 );
 
 
-const Dashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const Dashboard: React.FC<{ onBack: () => void; reports: SubmittedReport[] }> = ({ onBack, reports }) => {
+    const totalConversoes = reports.reduce((sum, report) => sum + report.data.totalConversoes, 0);
+    const totalAlunosDiscipulado = reports.reduce((sum, report) => sum + report.data.discTotalAlunos, 0);
+    const totalMatriculadosCead = reports.reduce((sum, report) => sum + report.data.ceadTotal, 0);
+    
+    const totalEvangelismos = reports.reduce((sum, report) => 
+        sum + 
+        report.data.ativEvangelismoPessoal +
+        report.data.ativEvangelismoTransito +
+        report.data.ativEvangelismoInfantil +
+        report.data.ativEvangelismoNoLar +
+        report.data.ativEvangelismoNoturno +
+        report.data.ativCultoRelampago, 
+    0);
+
+    const totalBencaos = reports.reduce((sum, report) => 
+        sum + 
+        report.data.bencaosBatismos + 
+        report.data.bencaosRenovos + 
+        report.data.bencaosCurasDivinas + 
+        report.data.bencaosOutros, 
+    0);
+
+    const totalBatismos = reports.reduce((sum, report) => sum + report.data.bencaosBatismos, 0);
+
     return (
         <div className="bg-white p-8 rounded-lg shadow-lg animate-fade-in">
             <div className="flex justify-between items-center mb-8 border-b-2 border-gray-200 pb-4">
@@ -38,13 +63,12 @@ const Dashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Placeholder data */}
-                <StatCard icon={<IconHeart className="h-8 w-8 text-red-500" />} title="Total de Conversões" value="23" color="border-red-500" />
-                <StatCard icon={<IconUsers className="h-8 w-8 text-purple-500" />} title="Total de Alunos (Discipulado)" value="147" color="border-purple-500" />
-                <StatCard icon={<IconGraduationCap className="h-8 w-8 text-green-500" />} title="Matriculados na CEAD" value="98" color="border-green-500" />
-                <StatCard icon={<IconClipboardList className="h-8 w-8 text-blue-500" />} title="Evangelismos Realizados" value="56" color="border-blue-500" />
-                <StatCard icon={<IconGift className="h-8 w-8 text-yellow-500" />} title="Bênçãos Agradecidas" value="15" color="border-yellow-500" />
-                <StatCard icon={<IconCheckCircle className="h-8 w-8 text-teal-500" />} title="Batismos" value="8" color="border-teal-500" />
+                <StatCard icon={<IconHeart className="h-8 w-8 text-red-500" />} title="Total de Conversões" value={totalConversoes} color="border-red-500" />
+                <StatCard icon={<IconUsers className="h-8 w-8 text-purple-500" />} title="Total de Alunos (Discipulado)" value={totalAlunosDiscipulado} color="border-purple-500" />
+                <StatCard icon={<IconGraduationCap className="h-8 w-8 text-green-500" />} title="Matriculados na CEAD" value={totalMatriculadosCead} color="border-green-500" />
+                <StatCard icon={<IconClipboardList className="h-8 w-8 text-blue-500" />} title="Evangelismos Realizados" value={totalEvangelismos} color="border-blue-500" />
+                <StatCard icon={<IconGift className="h-8 w-8 text-yellow-500" />} title="Bênçãos Agradecidas" value={totalBencaos} color="border-yellow-500" />
+                <StatCard icon={<IconCheckCircle className="h-8 w-8 text-teal-500" />} title="Batismos" value={totalBatismos} color="border-teal-500" />
             </div>
 
             <div className="mt-10 bg-gray-50 p-6 rounded-lg shadow-inner">

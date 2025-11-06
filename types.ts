@@ -96,3 +96,8 @@ export interface ReportData {
   dirigenteAssinatura: string;
   secretariaAssinatura: string;
 }
+
+export interface SubmittedReport {
+  data: ReportData;
+  status: 'pending' | 'validated';
+}
