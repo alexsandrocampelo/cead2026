@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback, ChangeEvent, useRef } from 'react';
+
+import React, { useState, useEffect, useCallback, ChangeEvent } from 'react';
 import type { ReportData, SubmittedReport } from './types';
 import {
   AREAS, MONTHS, WEEK_DAYS, SABADO_CULTOS,
   IconCheckCircle, IconDashboard, IconExport, IconInfo, IconBuilding,
   IconGraduationCap, IconClipboardList, IconUsers, IconHeart, IconGift,
-  IconBookOpen, IconLocationMarker, IconBriefcase, IconShieldCheck, IconArrowLeft,
-  IconDatabase // Adicionado
+  IconBookOpen, IconLocationMarker, IconBriefcase, IconShieldCheck, IconArrowLeft
 } from './constants';
 import Dashboard from './Dashboard';
 
@@ -20,7 +20,7 @@ const initialFormData: ReportData = {
   areaConferenciaMissionaria: 0, areaPreCongresso: 0, areaFormaturaDiscipulado: 0, areaCruzadaEvangelistica: 0, areaCultoJovensUnificado: 0, areaSabadoCultoJovens: '',
   discTurmasBasico: 0, discTurmasIntermediario: 0, discTurmasAvancado: 0, discTotalTurmas: 0, discTotalProfessores: 0, discPossuiResponsavel: 'sim', discAlunosBasico: 0, discAlunosIntermediario: 0, discAlunosAvancado: 0, discTotalAlunos: 0, discAlunosAdolescentes: 0, discAlunosJovens: 0, discAlunosAdultos: 0, discAlunosIdosos: 0, discAlunosPcd: 0,
   discFreqTotalPresencas: 0, discFreqTotalAusencias: 0, discFreqNovosAlunosMes: 0, discFreqConcluintesAguardandoBatismo: 0,
-  ministVisitasNovosConvertidos: 0, ministAconselhamentoIndividual: 0, ministVisitasMinisteriais: 0, ministVisitasApoiosArea: 0, ministDiasDiscipuladoFormouCultos: 0,
+  ministVisitasNovosConvertidos: 0, ministAconselhamentoIndividual: 0, ministVisitasMinisteriais: 0, ministVisitasApoiosArea: 0, ministDiasDiscipuladoFormouCultos: 0, ministReunioesMinisteriais: 0, ministEstudosBiblicosLideres: 0, ministTreinamentoObreiros: 0, ministProjetosSociais: 0,
   dirigenteAssinatura: '', secretariaAssinatura: ''
 };
 
@@ -34,8 +34,9 @@ const fieldLabels: { [key in keyof ReportData]?: string } = {
   literaturaQuantidade: 'Literatura Distribuída (Quantidade)',
   areaConferenciaMissionaria: 'Área: Conferência Missionária', areaPreCongresso: 'Área: Pré-Congresso', areaFormaturaDiscipulado: 'Área: Formatura de Discipulado', areaCruzadaEvangelistica: 'Área: Cruzada Evangelística', areaCultoJovensUnificado: 'Área: Culto de Jovens Unificado', areaSabadoCultoJovens: 'Área: Sábado do Culto de Jovens',
   discTurmasBasico: 'Discipulado: Turmas Básico', discTurmasIntermediario: 'Discipulado: Turmas Intermediário', discTurmasAvancado: 'Discipulado: Turmas Avançado', discTotalTurmas: 'Discipulado: Total de Turmas', discTotalProfessores: 'Discipulado: Total de Professores', discPossuiResponsavel: 'Discipulado: Possui Responsável?', discAlunosBasico: 'Discipulado: Alunos Básico', discAlunosIntermediario: 'Discipulado: Alunos Intermediário', discAlunosAvancado: 'Discipulado: Alunos Avançado', discTotalAlunos: 'Discipulado: Total de Alunos', discAlunosAdolescentes: 'Discipulado: Alunos Adolescentes', discAlunosJovens: 'Discipulado: Alunos Jovens', discAlunosAdultos: 'Discipulado: Alunos Adultos', discAlunosIdosos: 'Discipulado: Alunos Idosos', discAlunosPcd: 'Discipulado: Alunos PcD', discFreqTotalPresencas: 'Discipulado: Total de Presenças', discFreqTotalAusencias: 'Discipulado: Total de Ausências', discFreqNovosAlunosMes: 'Discipulado: Novos Alunos no Mês', discFreqConcluintesAguardandoBatismo: 'Discipulado: Concluintes Aguardando Batismo',
-  ministVisitasNovosConvertidos: 'Outras Atividades: Visitas a Novos Convertidos', ministAconselhamentoIndividual: 'Outras Atividades: Aconselhamento Individual', ministVisitasMinisteriais: 'Outras Atividades: Visitas Ministeriais', ministVisitasApoiosArea: 'Outras Atividades: Visitas de Apoios da Área', ministDiasDiscipuladoFormouCultos: 'Outras Atividades: Dias que Discipulado Formou em Cultos',
-  dirigenteAssinatura: 'Assinatura do Dirigente', secretariaAssinatura: 'Assinatura da Secretária',
+  ministVisitasNovosConvertidos: 'Visitas a Novos Convertidos', ministAconselhamentoIndividual: 'Aconselhamento Individual', ministVisitasMinisteriais: 'Visitas Ministeriais', ministVisitasApoiosArea: 'Visitas de Apoios da Área', ministDiasDiscipuladoFormouCultos: 'Dias que Discipulado Formou nos Cultos',
+  ministReunioesMinisteriais: 'Reuniões Ministeriais', ministEstudosBiblicosLideres: 'Estudos Bíblicos para Líderes', ministTreinamentoObreiros: 'Treinamento para Obreiros', ministProjetosSociais: 'Projetos Sociais',
+  dirigenteAssinatura: 'Assinatura do Dirigente da Campanha', secretariaAssinatura: 'Assinatura da Secretária da Campanha',
 };
 
 // --- Helper UI Components ---
@@ -77,7 +78,7 @@ const Header: React.FC<{ onDashboardClick: () => void; onCoordinatorClick: () =>
     <div className="flex justify-between items-center mt-4 border-t border-gray-700 pt-4">
       <div className="flex items-center">
         <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
-        <div className="ml-3 text-sm"><p>Salvamento Local Ativo</p><p className="text-gray-400">Rascunho salvo às {new Date().toLocaleTimeString()}</p></div>
+        <div className="ml-3 text-sm"><p>Sincronização Automática Ativa</p><p className="text-gray-400">Última sync: {new Date().toLocaleTimeString()}</p></div>
       </div>
       <div className="flex items-center space-x-2">
         <button onClick={onCoordinatorClick} className="flex items-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-md transition duration-300"><IconCheckCircle className="h-5 w-5 mr-2" /> Validação</button>
@@ -127,9 +128,6 @@ const ReportForm: React.FC<ReportFormProps> = ({ formData, onInputChange, onRadi
         
         {currentStep === 1 && (
             <>
-              <InfoBox color="yellow">
-                  <strong>Atenção:</strong> Seus relatórios são salvos apenas neste dispositivo (celular, computador, etc.). Para transferir dados entre dispositivos, use a função "Importar/Exportar" na tela inicial.
-              </InfoBox>
               <Section title="Informações Básicas" icon={<IconBuilding className="h-6 w-6" />} color="bg-blue-600">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="md:col-span-2"><FormField label="Congregação" name="congregacao" value={formData.congregacao} onChange={onInputChange} required placeholder="Digite o nome da congregação" /></div>
@@ -256,13 +254,18 @@ const ReportForm: React.FC<ReportFormProps> = ({ formData, onInputChange, onRadi
                   </div></div>
               </Section>
               
-              <Section title="Outras Atividades" icon={<IconBriefcase className="h-6 w-6" />} color="bg-gray-700">
+              <Section title="Relatório Ministerial" icon={<IconBriefcase className="h-6 w-6" />} color="bg-slate-700">
+                   <InfoBox color="purple">Detalhe as atividades realizadas pela liderança e ministério da congregação.</InfoBox>
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                        <FormField label="Visitas a Novos Convertidos" name="ministVisitasNovosConvertidos" value={formData.ministVisitasNovosConvertidos} onChange={onInputChange} type="number" />
                        <FormField label="Aconselhamento Individual" name="ministAconselhamentoIndividual" value={formData.ministAconselhamentoIndividual} onChange={onInputChange} type="number" />
                        <FormField label="Visitas Ministeriais" name="ministVisitasMinisteriais" value={formData.ministVisitasMinisteriais} onChange={onInputChange} type="number" />
                        <FormField label="Visitas de Apoios da Área" name="ministVisitasApoiosArea" value={formData.ministVisitasApoiosArea} onChange={onInputChange} type="number" />
-                       <div className="md:col-span-2"><FormField label="Dias que Discipulado Formou em Cultos" name="ministDiasDiscipuladoFormouCultos" value={formData.ministDiasDiscipuladoFormouCultos} onChange={onInputChange} type="number" description="Máximo 31 dias" /></div>
+                       <FormField label="Reuniões Ministeriais" name="ministReunioesMinisteriais" value={formData.ministReunioesMinisteriais} onChange={onInputChange} type="number" />
+                       <FormField label="Estudos Bíblicos para Líderes" name="ministEstudosBiblicosLideres" value={formData.ministEstudosBiblicosLideres} onChange={onInputChange} type="number" />
+                       <FormField label="Treinamento para Obreiros" name="ministTreinamentoObreiros" value={formData.ministTreinamentoObreiros} onChange={onInputChange} type="number" />
+                       <FormField label="Projetos Sociais" name="ministProjetosSociais" value={formData.ministProjetosSociais} onChange={onInputChange} type="number" description="Ex: cestas básicas, visitas a asilos, etc." />
+                       <div className="md:col-span-2"><FormField label="Dias que Discipulado Formou nos Cultos" name="ministDiasDiscipuladoFormouCultos" value={formData.ministDiasDiscipuladoFormouCultos} onChange={onInputChange} type="number" description="Máximo 31 dias. Refere-se aos dias em que a classe de discipulado participou ativamente do culto (louvor, oportunidade, etc)." /></div>
                   </div>
               </Section>
 
@@ -271,25 +274,32 @@ const ReportForm: React.FC<ReportFormProps> = ({ formData, onInputChange, onRadi
         )}
 
         {currentStep === 2 && (
-            <form onSubmit={handleSubmit}>
-                <Section title="Assinaturas Digitais" icon={<IconShieldCheck className="h-6 w-6" />} color="bg-teal-600">
-                    <InfoBox color="blue">Ao preencher seu nome completo abaixo, você confirma a veracidade de todas as informações contidas neste relatório. Esta ação tem validade de assinatura digital.</InfoBox>
-                    <div className="space-y-6">
-                        <FormField label="Assinatura do Dirigente da Congregação" name="dirigenteAssinatura" value={formData.dirigenteAssinatura} onChange={onInputChange} required placeholder="Digite o nome completo do Dirigente"/>
-                        <FormField label="Assinatura da Secretária de Missões" name="secretariaAssinatura" value={formData.secretariaAssinatura} onChange={onInputChange} required placeholder="Digite o nome completo da Secretária"/>
-                    </div>
-                </Section>
-                <div className="flex justify-between items-center mt-8">
-                    <button type="button" onClick={handlePrevStep} className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center"><span className="mr-2">←</span> Voltar</button>
-                    <button type="submit" className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center disabled:opacity-50 disabled:cursor-not-allowed" disabled={!formData.dirigenteAssinatura || !formData.secretariaAssinatura}><IconCheckCircle className="h-5 w-5 mr-2" /> Enviar para Validação</button>
+          <>
+            <Section title="Assinaturas Digitais" icon={<IconShieldCheck className="h-6 w-6" />} color="bg-teal-600">
+              <InfoBox color="blue">Ao preencher seu nome completo abaixo, você confirma a veracidade de todas as informações contidas neste relatório. Esta ação tem validade de assinatura digital.</InfoBox>
+              <form onSubmit={handleSubmit}>
+                <div className="space-y-6">
+                  <FormField label="Assinatura do Dirigente da Campanha" name="dirigenteAssinatura" value={formData.dirigenteAssinatura} onChange={onInputChange} required placeholder="Digite o nome completo do Dirigente da Campanha"/>
+                  <FormField label="Assinatura da Secretária da Campanha" name="secretariaAssinatura" value={formData.secretariaAssinatura} onChange={onInputChange} required placeholder="Digite o nome completo da Secretária da Campanha"/>
                 </div>
-            </form>
+                <div className="mt-8">
+                  <InfoBox color="green">
+                    Ao clicar em "Enviar Relatório por E-mail", seu programa de e-mail padrão será aberto com o relatório já preenchido e endereçado ao coordenador da área. Você só precisa clicar em "Enviar" no seu programa de e-mail.
+                  </InfoBox>
+                </div>
+                <div className="flex justify-between items-center mt-8">
+                  <button type="button" onClick={handlePrevStep} className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center"><span className="mr-2">←</span> Voltar</button>
+                  <button type="submit" className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center disabled:opacity-50 disabled:cursor-not-allowed" disabled={!formData.dirigenteAssinatura || !formData.secretariaAssinatura}><IconCheckCircle className="h-5 w-5 mr-2" /> Enviar Relatório por E-mail</button>
+                </div>
+              </form>
+            </Section>
+          </>
         )}
     </div>
   );
 };
 
-const AuthModal: React.FC<{ title: string; description: string; onAuthSuccess: () => void; onClose: () => void; correctPassword: string; children?: React.ReactNode; }> = ({ title, description, onAuthSuccess, onClose, correctPassword, children }) => {
+const AuthModal: React.FC<{ title: string; description: string; onAuthSuccess: () => void; onClose: () => void; correctPassword: string; }> = ({ title, description, onAuthSuccess, onClose, correctPassword }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const handleAuth = () => {
@@ -303,11 +313,10 @@ const AuthModal: React.FC<{ title: string; description: string; onAuthSuccess: (
         <h2 className="text-2xl font-bold text-gray-800 mb-4">{title}</h2>
         <p className="text-gray-600 mb-6">{description}</p>
         {error && <p className="bg-red-100 text-red-700 p-3 rounded-md mb-4 text-sm">{error}</p>}
-        {!children && <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} onKeyPress={handleKeyPress} placeholder="Digite a senha" className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" autoFocus />}
-        {children}
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} onKeyPress={handleKeyPress} placeholder="Digite a senha" className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" autoFocus />
         <div className="mt-6 flex justify-end space-x-4">
           <button onClick={onClose} className="px-6 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">Cancelar</button>
-          {!children && <button onClick={handleAuth} className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Acessar</button>}
+          <button onClick={handleAuth} className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Acessar</button>
         </div>
       </div>
     </div>
@@ -335,17 +344,24 @@ const CoordinatorView: React.FC<{ onBack: () => void; reports: SubmittedReport[]
         ) : (
           <div className="space-y-6">
             {reports.map((report, index) => (
-              report.status === 'pending' &&
-              <div key={index} className="p-6 rounded-lg shadow-md border-l-4 bg-white border-yellow-500">
+              <div key={index} className={`p-6 rounded-lg shadow-md border-l-4 ${report.status === 'pending' ? 'bg-white border-yellow-500' : 'bg-green-50 border-green-500'}`}>
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-xl font-bold text-gray-800">{report.data.congregacao}</p>
                     <p className="text-sm text-gray-500">{report.data.area} - {report.data.mes}/{report.data.ano}</p>
                     <p className="text-sm text-gray-600 mt-2">Enviado por: {report.data.dirigenteAssinatura}</p>
                   </div>
-                  <button onClick={() => onValidate(index)} className="flex items-center bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
-                    <IconCheckCircle className="h-5 w-5 mr-2" /> Validar Relatório
-                  </button>
+                  <div>
+                    {report.status === 'pending' ? (
+                      <button onClick={() => onValidate(index)} className="flex items-center bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                        <IconCheckCircle className="h-5 w-5 mr-2" /> Validar Relatório
+                      </button>
+                    ) : (
+                      <div className="flex items-center text-green-600 font-semibold bg-green-100 px-4 py-2 rounded-full">
+                        <IconCheckCircle className="h-5 w-5 mr-2" /> Validado
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -355,56 +371,53 @@ const CoordinatorView: React.FC<{ onBack: () => void; reports: SubmittedReport[]
   );
 };
 
+const SuccessMessage: React.FC<{ onClose: () => void; congregacao: string; mes: string; }> = ({ onClose, congregacao, mes }) => (
+  <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 animate-fade-in">
+    <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-lg m-4 text-center">
+      <IconCheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">Relatório Pronto para Envio!</h2>
+      <p className="text-gray-600 mb-6">
+        Seu programa de e-mail foi aberto com o relatório da congregação <strong>{congregacao}</strong> para o mês de <strong>{mes}</strong>.
+        <br />
+        Por favor, apenas clique em "Enviar" no seu programa de e-mail para finalizar.
+      </p>
+      <button 
+        onClick={onClose} 
+        className="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition duration-300"
+      >
+        Entendido, preencher novo relatório
+      </button>
+    </div>
+  </div>
+);
+
+
 const App: React.FC = () => {
   const [view, setView] = useState<'form' | 'dashboard' | 'coordinator'>('form');
   const [showDashboardModal, setShowDashboardModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showCoordinatorModal, setShowCoordinatorModal] = useState(false);
-  const [showTransferModal, setShowTransferModal] = useState(false);
-  const importFileRef = useRef<HTMLInputElement>(null);
-  
-  const [formData, setFormData] = useState<ReportData>(() => {
-    try {
-      const localData = localStorage.getItem('reportDraft');
-      return localData ? JSON.parse(localData) : initialFormData;
-    } catch (error) {
-      console.error("Could not parse draft from localStorage", error);
-      return initialFormData;
-    }
-  });
-  
-  const [submittedReports, setSubmittedReports] = useState<SubmittedReport[]>(() => {
-    try {
-      const localData = localStorage.getItem('submittedReports');
-      return localData ? JSON.parse(localData) : [];
-    } catch (error) {
-      console.error("Could not parse localStorage reports", error);
-      return [];
-    }
-  });
+  const [formData, setFormData] = useState<ReportData>(initialFormData);
+  const [submittedReports, setSubmittedReports] = useState<SubmittedReport[]>([]);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [lastSubmittedInfo, setLastSubmittedInfo] = useState({ congregacao: '', mes: '' });
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      // Force re-render to update the "last saved" timestamp in the header
-      setFormData(prev => ({...prev}));
-    }, 60000); // every minute
-    return () => clearInterval(timer);
+    try {
+      const storedReports = localStorage.getItem('submittedReports');
+      if (storedReports) {
+        setSubmittedReports(JSON.parse(storedReports));
+      }
+    } catch (error) {
+      console.error("Failed to parse reports from localStorage", error);
+    }
   }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('reportDraft', JSON.stringify(formData));
-    } catch (error) {
-      console.error("Failed to save draft to localStorage:", error);
-    }
-  }, [formData]);
 
   useEffect(() => {
     try {
       localStorage.setItem('submittedReports', JSON.stringify(submittedReports));
     } catch (error) {
-      console.error("Failed to save reports to localStorage:", error);
-      alert("Atenção: Não foi possível salvar os relatórios. O armazenamento local do seu navegador pode estar cheio ou desativado.");
+      console.error("Failed to save reports to localStorage", error);
     }
   }, [submittedReports]);
 
@@ -443,96 +456,90 @@ const App: React.FC = () => {
 
   const handleDataExport = () => {
     if (submittedReports.length === 0) {
-      alert('Não há relatórios para exportar.');
-      return;
+        alert('Nenhum relatório para exportar.');
+        return;
     }
 
-    const reportKeys = Object.keys(initialFormData) as Array<keyof ReportData>;
-    const headers = [...reportKeys.map(key => fieldLabels[key] || key), "Status da Validação"].join(',');
+    const reportKeys = Object.keys(initialFormData) as (keyof ReportData)[];
+    const headers = [...reportKeys.map(key => fieldLabels[key] || key), 'Status'].join(',');
 
     const rows = submittedReports.map(report => {
         const values = reportKeys.map(key => {
             const value = report.data[key];
             const strValue = String(value);
             return strValue.includes(',') ? `"${strValue}"` : strValue;
-        }).join(',');
-        return `${values},${report.status}`;
-    }).join('\n');
-
-    const csvContent = `${headers}\n${rows}`;
+        });
+        values.push(report.status);
+        return values.join(',');
+    });
+    
+    const csvContent = `${headers}\n${rows.join('\n')}`;
     const blob = new Blob([`\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `banco_de_dados_relatorios_ieadpe_${new Date().toISOString().slice(0,10)}.csv`);
+    link.setAttribute('download', 'relatorios_ieadpe.csv');
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  };
-
-  const handleExportJson = () => {
-    if (submittedReports.length === 0) {
-      alert('Não há dados para exportar.');
-      return;
-    }
-    const jsonString = JSON.stringify(submittedReports, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `relatorios-ieadpe-backup-${new Date().toISOString().slice(0, 10)}.json`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const handleImportJson = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (submittedReports.length > 0) {
-      if (!window.confirm('A importação substituirá todos os dados existentes. Deseja continuar?')) {
-        return;
-      }
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const text = e.target?.result;
-        if (typeof text !== 'string') throw new Error('File could not be read');
-        const data = JSON.parse(text);
-        if (Array.isArray(data) && data.every(item => 'data' in item && 'status' in item)) {
-          setSubmittedReports(data);
-          alert('Dados importados com sucesso!');
-          setShowTransferModal(false);
-        } else {
-          throw new Error('Formato de arquivo inválido.');
-        }
-      } catch (error) {
-        alert(`Erro ao importar o arquivo: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
-      }
-    };
-    reader.readAsText(file);
   };
 
   const handleFormSubmit = (data: ReportData) => {
     setSubmittedReports(prev => [...prev, { data, status: 'pending' }]);
+
+    const reportKeys = Object.keys(initialFormData) as (keyof ReportData)[];
+    const headers = reportKeys.map(key => fieldLabels[key] || key).join(',');
+    const row = reportKeys.map(key => {
+        const value = data[key];
+        const strValue = String(value);
+        return strValue.includes(',') ? `"${strValue}"` : strValue;
+    }).join(',');
+    const csvContent = `${headers}\n${row}`;
+
+    const recipientEmail = 'alexsandroinformacoes@gmail.com'; // E-mail fixo
+    const subject = `Relatório Ministerial: ${data.congregacao} - ${data.mes}/${data.ano}`;
+    const body = `Olá, Coordenador,
+
+Segue o relatório ministerial da congregação ${data.congregacao} para o mês de ${data.mes}/${data.ano}.
+
+Os dados estão no corpo deste e-mail em formato CSV para fácil importação.
+
+INSTRUÇÕES PARA O EXCEL:
+1. Copie todo o texto abaixo da linha pontilhada.
+2. Abra o Bloco de Notas (ou outro editor de texto simples).
+3. Cole o texto copiado.
+4. Salve o arquivo com a extensão ".csv" (ex: relatorio.csv).
+5. Abra o arquivo .csv salvo com o Microsoft Excel.
+
+Atenciosamente,
+Dirigente: ${data.dirigenteAssinatura}
+Secretaria: ${data.secretariaAssinatura}
+
+----------------------------------------------------
+DADOS DO RELATÓRIO (FORMATO CSV)
+----------------------------------------------------
+${csvContent}
+    `;
+
+    const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoLink;
+
+    setLastSubmittedInfo({ congregacao: data.congregacao, mes: data.mes });
+    setShowSuccessMessage(true);
     setFormData(initialFormData);
-    alert('Relatório enviado com sucesso! Ele agora está pendente de aprovação na tela de Validação do Coordenador.');
   };
   
   const handleValidateReport = (indexToValidate: number) => {
-    const reportToValidate = submittedReports[indexToValidate];
-    if (reportToValidate && window.confirm(`Deseja realmente validar o relatório da congregação "${reportToValidate.data.congregacao}"?`)) {
-      setSubmittedReports(prev => 
-        prev.map((report, index) => 
-          index === indexToValidate ? { ...report, status: 'validated' } : report
-        )
-      );
-    }
+    setSubmittedReports(prev => 
+      prev.map((report, index) => 
+        index === indexToValidate ? { ...report, status: 'validated' } : report
+      )
+    );
+  };
+
+  const handleCloseSuccessMessage = () => {
+    setShowSuccessMessage(false);
   };
 
   return (
@@ -544,28 +551,33 @@ const App: React.FC = () => {
             {view === 'form' && (
               <>
                 <Header onDashboardClick={() => setShowDashboardModal(true)} onCoordinatorClick={() => setShowCoordinatorModal(true)} />
-                <div className="bg-white p-6 shadow-lg grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white p-6 shadow-lg">
                   <button onClick={() => setShowExportModal(true)} className="flex items-center w-full justify-center bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-4 rounded-md transition duration-300">
-                      <IconExport className="h-5 w-5 mr-2" /> Exportar para Excel/Power BI
-                  </button>
-                  <button onClick={() => setShowTransferModal(true)} className="flex items-center w-full justify-center bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-md transition duration-300">
-                      <IconDatabase className="h-5 w-5 mr-2" /> Importar/Exportar Dados
+                      <IconExport className="h-5 w-5 mr-2" /> Exportar Relatórios para Excel
                   </button>
                 </div>
                 <ReportForm formData={formData} onInputChange={handleInputChange} onRadioChange={handleRadioChange} setFormData={setFormData} onFinalSubmit={handleFormSubmit} />
               </>
             )}
-            {view === 'dashboard' && <Dashboard reports={submittedReports} onBack={() => setView('form')} />}
+            {view === 'dashboard' && <Dashboard onBack={() => setView('form')} reports={submittedReports} />}
             {view === 'coordinator' && <CoordinatorView onBack={() => setView('form')} reports={submittedReports} onValidate={handleValidateReport} />}
           </div>
         </main>
         <div className="w-16 bg-gradient-to-b from-blue-500 to-cyan-500 flex-shrink-0 hidden md:block"></div>
       </div>
       
+      {showSuccessMessage && (
+        <SuccessMessage 
+            onClose={handleCloseSuccessMessage} 
+            congregacao={lastSubmittedInfo.congregacao}
+            mes={lastSubmittedInfo.mes}
+        />
+      )}
+
       {showDashboardModal && (
         <AuthModal 
           title="Acesso ao Dashboard"
-          description="Por favor, insira a senha para visualizar o dashboard com os dados atualizados."
+          description="Por favor, insira a senha para visualizar o dashboard."
           onAuthSuccess={() => { setView('dashboard'); setShowDashboardModal(false); }}
           onClose={() => setShowDashboardModal(false)}
           correctPassword="dashboard123"
@@ -584,32 +596,12 @@ const App: React.FC = () => {
 
       {showExportModal && (
         <AuthModal 
-          title="Exportar para Excel/Power BI"
-          description="Insira a senha para exportar todos os relatórios enviados para um arquivo CSV."
+          title="Exportar Relatório"
+          description="Por favor, insira a senha para exportar os dados para Excel (CSV)."
           onAuthSuccess={() => { handleDataExport(); setShowExportModal(false); }}
           onClose={() => setShowExportModal(false)}
           correctPassword="dashboard123"
         />
-      )}
-      
-      {showTransferModal && (
-          <AuthModal
-              title="Transferência de Dados"
-              description="Use esta ferramenta para salvar um backup (Exportar) ou carregar dados de outro dispositivo (Importar)."
-              onAuthSuccess={() => {}}
-              onClose={() => setShowTransferModal(false)}
-              correctPassword="transferir123"
-          >
-              <div className="mt-4 space-y-4">
-                  <button onClick={handleExportJson} className="w-full flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md transition duration-300">
-                      <IconExport className="h-5 w-5 mr-2" /> Exportar Dados (Backup)
-                  </button>
-                  <button onClick={() => importFileRef.current?.click()} className="w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md transition duration-300">
-                      <IconDatabase className="h-5 w-5 mr-2" /> Importar Dados (Restaurar)
-                  </button>
-                  <input type="file" ref={importFileRef} onChange={handleImportJson} className="hidden" accept=".json" />
-              </div>
-          </AuthModal>
       )}
     </>
   );
